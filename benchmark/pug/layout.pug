@@ -1,0 +1,31 @@
+- var links = [{ href: '/', name: 'Home' }, { href: '/blog', name: 'Blog' },{ href: '/about', name: 'About' }]
+
+mixin NavigationLink(link, currentPage)
+    - var isCurrentPage = currentPage === link.href
+    li
+        a(href=link.href, aria-current=isCurrentPage ? 'page' : false) #{link.name}
+
+mixin Navigation(currentPage)
+    nav
+        ul
+            each link in links
+                +NavigationLink(link, currentPage)
+
+doctype html
+html
+    head
+        meta(charset='utf-8')
+        meta(name='utf-8', content='width=device-width,initial-scale=1')
+        link(href='/public/main.css', rel='stylesheet', type='text/css')
+        link(rel='icon', href='/public/favicon.ico')
+        title #{title}
+    body
+        header#main-header
+            img#logo(alt='blog logo', src='/public/logo.webp')
+            h1 #{title}
+            +Navigation(currentPage)
+        main
+            p Hi! I am Laurent and this is my dev blog. This is where I collect what I learn, what I experiment and what I find interesting.
+            block content
+        footer
+            p © Laurent RENARD. All Rights Reserved.

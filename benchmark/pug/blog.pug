@@ -1,0 +1,17 @@
+extends layout.pug
+
+mixin Post(post)
+    article.post-preview
+        h3 #{post.title}
+        p.meta Published by #{post.author} on #[time #{post.publicationDate}]
+        p #{post.description}
+        a(rel='bookmark', href=post.permalink) Read full article
+
+mixin Blog(posts)
+    section
+        h2 Latest articles
+        each post in posts
+            +Post(post)
+
+block content
+        +Blog(posts)

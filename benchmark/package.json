@@ -3,7 +3,8 @@
   "scripts": {
     "dev": "node --watch index.js",
     "start": "NODE_ENV=production node index.js",
-    "bench:tpl-stream":"autocannon http://localhost:3000/tpl-stream"
+    "bench:tpl-stream":"autocannon http://localhost:3000/tpl-stream",
+    "bench:pug":"autocannon http://localhost:3000/pug"
   },
   "devDependencies": {
     "@fastify/static": "^7.0.2",

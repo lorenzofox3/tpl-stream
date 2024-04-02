@@ -1,4 +1,5 @@
 import { setTimeout } from 'node:timers/promises';
+import { env } from 'node:process';
 
 const author = 'Laurent RENARD';
 
@@ -45,9 +46,10 @@ const postList = [
   },
 ];
 
-const LATENCY = 0;
+const LATENCY = env.DB_LATENCY || 10;
 
 export async function getPosts() {
-  await setTimeout(LATENCY);
+  const latency = Math.round(Math.random() * LATENCY);
+  await setTimeout(latency);
   return [...postList];
 }

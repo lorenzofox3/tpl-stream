@@ -1,0 +1,40 @@
+{
+  "name": "tpl-stream",
+  "version": "0.0.1",
+  "description": "html template library that supports streaming for javascript runtimes",
+  "main": "src/index.js",
+  "type": "module",
+  "scripts": {
+    "test": "pta",
+    "format": "prettier",
+    "dev": "node --watch ./node_modules/.bin/pta"
+  },
+  "files": [
+    "src/"
+  ],
+  "prettier": {
+    "singleQuote": true
+  },
+  "exports": {
+    ".": {
+      "default": "./src/index.js"
+    },
+    "./pacakge.json": "./package.json"
+  },
+  "keywords": [
+    "html",
+    "stream",
+    "template",
+    "pug",
+    "ejs",
+    "handlebar",
+    "ssr"
+  ],
+  "author": "Laurent RENARD",
+  "license": "MIT",
+  "devDependencies": {
+    "prettier": "^3.2.5",
+    "pta": "^1.2.0",
+    "zora": "^5.2.0"
+  }
+}

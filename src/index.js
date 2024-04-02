@@ -13,7 +13,7 @@ const compile = (templateParts, ...values) => {
     Array.from({ length: values.length }, (_, i) => 'arg' + i),
   ];
   const gen = new GeneratorFunction(...args, src);
-  return (...values) => gen({ escape }, ...values);
+  return (...values) => gen({ escape, attributesFragment }, ...values);
 };
 
 const buildSource = (templateParts, ...values) => {
@@ -29,10 +29,20 @@ const buildSource = (templateParts, ...values) => {
         return src + `;yield arg${i}; yield \`${tplPart}\``;
       }
 
+      if (typeof value === 'object') {
+        return src + `+utils.attributesFragment(arg${i}) + \`${tplPart}\``;
+      }
+
       return src + `+utils.escape(String(arg${i})) + \`${tplPart}\``;
     }, `yield \`${first}\``) + ';'
   );
 };
+
+const attributesFragment = (value) =>
+  Object.entries(value)
+    .filter(([_, value]) => value !== false)
+    .map(([attr, value]) => `${attr}="${escape(value)}"`)
+    .join(' ');
 
 const isAsync = (value) =>
   value?.then !== undefined || value?.[Symbol.asyncIterator];

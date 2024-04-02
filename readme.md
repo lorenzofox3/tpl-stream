@@ -1,5 +1,7 @@
 # tpl-steam
 
+[![install size](https://packagephobia.com/badge?p=tpl-stream)](https://packagephobia.com/result?p=tpl-stream)
+
 ``tpl-stream`` is a template library that supports streaming. You can use it in your server, but not only, to generate html: it works everywhere as long as the runtime
 implements [web streams](https://developer.mozilla.org/en-US/docs/Web/API/ReadableStream).
 

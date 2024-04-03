@@ -1,0 +1,8 @@
+<nav>
+    <ul>
+        <% [{ href: '/', name: 'Home' },{ href: '/blog', name: 'Blog' },{ href: '/about', name: 'About' }].forEach(function (link) { -%>
+        <% const isCurrentPage = link.href === currentPage -%>
+        <%- include('navigation-link', {link, isCurrentPage}) %>
+        <% })-%>
+    </ul>
+</nav>

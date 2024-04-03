@@ -3,15 +3,16 @@
   "scripts": {
     "dev": "node --watch index.js",
     "start": "NODE_ENV=production node index.js",
-    "bench:tpl-stream":"autocannon http://localhost:3000/tpl-stream",
-    "bench:pug":"autocannon http://localhost:3000/pug"
+    "bench:tpl-stream": "autocannon http://localhost:3000/tpl-stream",
+    "bench:pug": "autocannon http://localhost:3000/pug",
+    "bench:ejs": "autocannon http://localhost:3000/ejs"
   },
   "devDependencies": {
     "@fastify/static": "^7.0.2",
     "autocannon": "^7.15.0",
     "ejs": "^3.1.9",
-    "eta": "^3.4.0",
     "fastify": "^4.26.2",
-    "pug": "^3.0.2"
+    "pug": "^3.0.2",
+    "@fastify/view": "^9.0.0"
   }
 }

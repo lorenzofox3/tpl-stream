@@ -1,0 +1,25 @@
+<!doctype html>
+<html>
+    <head>
+        <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width,initial-scale=1" />
+        <link href="/public/main.css" rel="stylesheet" type="text/css" />
+        <link rel="icon" href="./public/favicon.ico" />
+        <title><%= title %></title>
+    </head>
+    <body>
+    <header id="main-header">
+        <img id="logo" alt="blog logo" src="/public/logo.webp" />
+        <h1><%= title %></h1>
+        <%- include('./navigation', { currentPage}) %>
+    </header>
+    <main>
+        <p>
+            Hi! I am Laurent and this is my dev blog. This is where I collect what
+            I learn, what I experiment and what I find interesting.
+        </p>
+        <%- include('blog', {posts}) %>
+    </main>
+    <footer><p>© Laurent RENARD. All Rights Reserved.</p></footer>
+    </body>
+</html>

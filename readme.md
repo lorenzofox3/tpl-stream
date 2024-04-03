@@ -5,7 +5,7 @@
 ``tpl-stream`` is a template library that supports streaming. You can use it in your server, but not only, to generate html: it works everywhere as long as the runtime
 implements [web streams](https://developer.mozilla.org/en-US/docs/Web/API/ReadableStream).
 
-It is very small compared to the alternatives and does not require build process, while providing very good performances.
+It is very small compared to the alternatives and does not require any build process, while providing [very good performances](./benchmark).
 
 ## Installation
 
@@ -94,7 +94,7 @@ html`<button ${{disabled:false, ['aria-controls']:'woot'}}>hello</button>`
 // <button aria-controls="woot">hello</button>
 ```
 
-## render
+### render
 
 The ``render`` function takes a template as input and returns a ``ReadableStream``. The chunks are split every time there is a pending Promise: 
 
@@ -105,4 +105,9 @@ The ``render`` function takes a template as input and returns a ``ReadableStream
 ```
 
 You can also render as a string, by awaiting the Promise returned by ``renderAsString`` function 
+
+## Perceived speed.
+
+Note that streaming can also improve the _perceived_ speed as the browser renders the HTML (and eventually fetch some resources) while the server has not fully responded to the request.
+This is the behavior you can observe below with an exaggerated latency of 1s. You can combine libraries such ``tpl-stream`` with techniques such [Out Of Order streaming](https://lamplightdev.com/) to improve the user experience even further. 
 

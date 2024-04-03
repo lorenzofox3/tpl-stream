@@ -4,6 +4,7 @@ import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { tplStreamPlugin } from './tpl-stream/index.js';
 import { pugPlugin } from './pug/index.js';
+import { ejsPlugin } from './ejs/index.js';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 
@@ -18,5 +19,6 @@ app.register(fastifyStatic, {
 
 app.register(tplStreamPlugin, { prefix: '/tpl-stream' });
 app.register(pugPlugin, { prefix: '/pug' });
+app.register(ejsPlugin, { prefix: '/ejs' });
 
 app.listen({ port: 3000 });

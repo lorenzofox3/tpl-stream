@@ -1,0 +1,11 @@
+<li>
+    <% if(isCurrentPage) { %>
+        <a href="<%= link.href %>" aria-current="page" >
+            <%= link.name %>
+        </a>
+    <% } else { %>
+        <a href="<%= link.href %>" >
+            <%= link.name %>
+        </a>
+    <% } %>
+</li>

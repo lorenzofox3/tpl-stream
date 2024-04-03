@@ -1,0 +1,6 @@
+<section>
+    <h2>Latest articles</h2>
+    <% posts.forEach(function (post) { -%>
+        <%- include('post', {post}) %>
+    <% }); -%>
+</section>

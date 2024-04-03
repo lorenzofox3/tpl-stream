@@ -109,5 +109,13 @@ You can also render as a string, by awaiting the Promise returned by ``renderAsS
 ## Perceived speed.
 
 Note that streaming can also improve the _perceived_ speed as the browser renders the HTML (and eventually fetch some resources) while the server has not fully responded to the request.
-This is the behavior you can observe below with an exaggerated latency of 1s. You can combine libraries such ``tpl-stream`` with techniques such [Out Of Order streaming](https://lamplightdev.com/) to improve the user experience even further. 
+This is the behavior you can observe below with an exaggerated latency of 1s (streaming on the left, buffered on the right). 
+
+You can combine libraries such ``tpl-stream`` with techniques such [Out Of Order streaming](https://lamplightdev.com/) to improve the user experience even further. 
+
+
+
+https://github.com/lorenzofox3/tpl-stream/assets/2402022/d0a52057-240f-4ee4-afe7-920acea8a1af
+
+
 

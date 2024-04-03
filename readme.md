@@ -2,10 +2,10 @@
 
 [![install size](https://packagephobia.com/badge?p=tpl-stream)](https://packagephobia.com/result?p=tpl-stream)
 
-``tpl-stream`` is a template library that supports streaming. You can use it in your server, but not only, to generate html: it works everywhere as long as the runtime
+``tpl-stream`` is a Javascript template library that supports streaming. You can use it in your server, but not only, to generate html: it works everywhere as long as the runtime
 implements [web streams](https://developer.mozilla.org/en-US/docs/Web/API/ReadableStream).
 
-It is very small compared to the alternatives and does not require any build process, while providing [very good performances](./benchmark).
+It is very small compared to the alternatives and does not require any build step, while providing [very good performances](./benchmark).
 
 ## Installation
 
@@ -35,7 +35,7 @@ const htmlString = await renderAsString(Greeting({name: 'Lorenzofox', classname:
 ```
 
 when rendered, the html string will be ``'<p class="primary">Lorenzofox</p>'``
-Interpolated expressions are automatically escaped whether they correspond to a text content or to an attribute.
+Interpolated expressions are automatically escaped (for safety) whether they correspond to a text content or to an attribute.
 
 If you wish not to escape a string, you can put it inside an array:
 
@@ -62,7 +62,7 @@ const htmlString = await renderAsString(Tpl1({
 
 ### Conditionals
 
-When using conditional, via ternary expression for example, make sure all the branches are isomorphic: the templates are compiled for optimization and this based on the interpretation of the first interpolated value:
+When using conditional, via ternary expression for example, make sure all the branches are isomorphic: the templates are compiled for optimization and this is based on the interpretation of the first interpolated value:
 
 ```js
 // don't
@@ -75,7 +75,7 @@ When using conditional, via ternary expression for example, make sure all the br
 ### Containers
 
 You can interpolate some _containers_: Promise, Iterable(Array) or Objects
-These containers must contain template, string or another container
+These containers must contain a template, a string or another container
 
 ```js
 html`<ul>${['foo', 'bar'].map(str => html`<li>${str}</li>`)}</ul>`
@@ -85,8 +85,8 @@ html`<ul>${['foo', 'bar'].map(str => html`<li>${str}</li>`)}</ul>`
 html`<p>${Promise.resolve(html`<span>42</span>`)}</p>`
 ```
 
-An object container will always be interpreted as a map of attributes (there is no parsing context). 
-key value pairs whose value is strictly equal to ``false`` are ignore
+Any object container will always be interpreted as a map of attributes (there is no parsing context). 
+key value pairs whose value is strictly equal to ``false`` are ignored.
 
 ```js
 html`<button ${{disabled:false, ['aria-controls']:'woot'}}>hello</button>`
@@ -104,14 +104,14 @@ The ``render`` function takes a template as input and returns a ``ReadableStream
 // chunks: ['<p>foo<span>43</span>woot</span>', 'woot'</span></p>]
 ```
 
-You can also render as a string, by awaiting the Promise returned by ``renderAsString`` function 
+You can also render a template as a string, by awaiting the Promise returned by ``renderAsString`` function 
 
-## Perceived speed.
+## Perceived speed
 
 Note that streaming can also improve the _perceived_ speed as the browser renders the HTML (and eventually fetch some resources) while the server has not fully responded to the request.
 This is the behavior you can observe below: the database has an (exagerated) latency of 1s when the server calls it to fetch the blog posts data. On the left side, the server has already started streaming the first part of the HTML and the browser can already render the upper part of the document while the database is still responding. 
 
-You can combine libraries such ``tpl-stream`` with techniques such [Out Of Order streaming](https://lamplightdev.com/) to improve the user experience even further. 
+You can combine libraries such ``tpl-stream`` with techniques like [Out Of Order streaming](https://lamplightdev.com/) to improve the user experience even further. 
 
 
 

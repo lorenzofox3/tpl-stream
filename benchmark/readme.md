@@ -5,6 +5,8 @@ different baselines: the same [fastify](https://fastify.dev/) application built 
 
 ## The application 
 
+![Screenshot 2024-04-03 at 11 05 47](https://github.com/lorenzofox3/tpl-stream/assets/2402022/cc021ce7-5405-4690-8d9b-43904fb05c45)
+
 The application is a blog page where posts are loaded from a fake database. To simulate some latency we run the following code:
 ```js
 const LATENCY = env.DB_LATENCY || 10;

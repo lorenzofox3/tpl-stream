@@ -109,7 +109,7 @@ You can also render as a string, by awaiting the Promise returned by ``renderAsS
 ## Perceived speed.
 
 Note that streaming can also improve the _perceived_ speed as the browser renders the HTML (and eventually fetch some resources) while the server has not fully responded to the request.
-This is the behavior you can observe below with an exaggerated latency of 1s (streaming on the left, buffered on the right). 
+This is the behavior you can observe below: the database has an (exagerated) latency of 1s when the server calls it to fetch the blog posts data. On the left side, the server has already started streaming the first part of the HTML and the browser can already render the upper part of the document while the database is still responding. 
 
 You can combine libraries such ``tpl-stream`` with techniques such [Out Of Order streaming](https://lamplightdev.com/) to improve the user experience even further. 
 

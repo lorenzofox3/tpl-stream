@@ -74,7 +74,7 @@ When using conditional, via ternary expression for example, make sure all the br
 
 ### Containers
 
-You can interpolate some _containers_: Promise, Iterable(Array) or Objects
+You can interpolate some _containers_: Promise, Iterable(Array), Streams(anything that implements AsyncIterator) or Objects
 These containers must contain a template, a string or another container
 
 ```js

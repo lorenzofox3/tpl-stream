@@ -73,10 +73,20 @@ function* _render(template, controller) {
       yield* _render(chunk, controller);
     } else if (chunk?.then) {
       const resolved = yield chunk;
-      if (typeof resolved === 'string') {
-        controller.enqueue(resolved);
-      } else {
-        yield* _render(resolved, controller);
+      yield* _render(
+        typeof resolved === 'string' ? [resolved] : resolved,
+        controller,
+      );
+    } else if (chunk?.[Symbol.asyncIterator]) {
+      while (true) {
+        const { value: resolved, done } = yield chunk.next();
+        if (done === true) {
+          break;
+        }
+        yield* _render(
+          typeof resolved === 'string' ? [resolved] : resolved,
+          controller,
+        );
       }
     } else {
       throw new Error('Unsupported chunk');

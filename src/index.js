@@ -10,7 +10,7 @@ const compile = (templateParts, ...values) => {
   const src = buildSource(templateParts, ...values);
   const args = [
     'utils',
-    Array.from({ length: values.length }, (_, i) => 'arg' + i),
+    ...Array.from({ length: values.length }, (_, i) => 'arg' + i),
   ];
   const gen = new GeneratorFunction(...args, src);
   return (...values) => gen({ escape, attributesFragment }, ...values);

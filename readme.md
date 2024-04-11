@@ -23,7 +23,7 @@ import {render, html} from 'https://unpkg.com/tpl-stream/src/index.js';
 
 ### Basics
 
-You can define a template using the ``html`` [tagged template](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Template_literals#tagged_templates):
+You define a template using the ``html`` [tagged template](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Template_literals#tagged_templates):
 
 ```js
 import {html, renderAsString} from 'tpl-stream';
@@ -45,7 +45,7 @@ html`<p>${['<span>42</span>']}</p>`
 
 ### Composition
 
-You can combine several templates to compose more complex templates:
+Combine several templates to compose more complex templates:
 
 ```js
 const Tpl1 = ({title, content}) => html`<h1>${title}</h1><main>${content}</main>`;
@@ -62,7 +62,7 @@ const htmlString = await renderAsString(Tpl1({
 
 ### Conditionals
 
-When using conditional, via ternary expression for example, make sure all the branches are isomorphic: the templates are compiled for optimization and this is based on the interpretation of the first interpolated value:
+When using conditional, via ternary expression for example, make sure all the branches are isomorphic(they return the same type): the templates are compiled for optimization and this is based on the interpretation of the first interpolated value:
 
 ```js
 // don't
@@ -108,7 +108,7 @@ You can also render a template as a string, by awaiting the Promise returned by 
 
 ## Perceived speed
 
-Note that streaming can also improve the _perceived_ speed as the browser renders the HTML (and eventually fetch some resources) while the server has not fully responded to the request.
+Note that streaming may also improve the _perceived_ speed as the browser renders the HTML (and eventually fetch some resources) while the server has not fully responded to the request.
 This is the behavior you can observe below: the database has an (exagerated) latency of 1s when the server calls it to fetch the blog posts data. On the left side, the server has already started streaming the first part of the HTML and the browser can already render the upper part of the document while the database is still responding. 
 
 You can combine libraries such ``tpl-stream`` with techniques like [Out Of Order streaming](https://lamplightdev.com/blog/2024/01/10/streaming-html-out-of-order-without-javascript/) to improve the user experience even further. 

@@ -5,7 +5,7 @@
 ``tpl-stream`` is a Javascript template library that supports streaming. You can use it in your server, but not only, to generate html: it works everywhere as long as the runtime
 implements [web streams](https://developer.mozilla.org/en-US/docs/Web/API/ReadableStream).
 
-It is very small compared to the alternatives and does not require any build step, while providing [very good performances](./benchmark).
+It is very small compared to the alternatives and does not require any build step, while providing [very good performances](./benchmark). You will find more details in [this blog post](https://lorenzofox.dev/posts/html-streaming-part-2/)
 
 ## Installation
 

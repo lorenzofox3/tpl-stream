@@ -1,4 +1,4 @@
-# tpl-steam
+# tpl-stream
 
 [![install size](https://packagephobia.com/badge?p=tpl-stream)](https://packagephobia.com/result?p=tpl-stream)
 

@@ -33,8 +33,8 @@
   "author": "Laurent RENARD",
   "license": "MIT",
   "devDependencies": {
-    "prettier": "^3.2.5",
-    "pta": "^1.2.0",
-    "zora": "^5.2.0"
+    "prettier": "^3.5.3",
+    "pta": "^1.3.0",
+    "zora": "^6.0.0"
   }
 }

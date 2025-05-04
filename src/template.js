@@ -1,3 +1,5 @@
+import { templateCache } from './cache.js';
+
 export { html };
 
 function html(templateParts, ...values) {
@@ -9,8 +11,6 @@ function html(templateParts, ...values) {
 }
 
 const { constructor: GeneratorFunction } = function* () {};
-
-const templateCache = new WeakMap();
 
 const zip = (arr1, arr2) => arr1.map((item, index) => [item, arr2[index]]);
 

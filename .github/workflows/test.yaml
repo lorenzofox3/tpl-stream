@@ -29,6 +29,19 @@ jobs:
       - name: Test
         run: npm t
 
+  types:
+    name: Test types
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-node@v3
+        with:
+          node-version: 22
+      - name: Install dependencies
+        run: npm i
+      - name: Test
+        run: npm run test:types
+
   restricted-runtime:
     name: Test (restricted runtime / no eval) (Node ${{ matrix.node-version }})
     runs-on: ubuntu-latest

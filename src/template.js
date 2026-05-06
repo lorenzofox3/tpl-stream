@@ -1,63 +1,35 @@
-import { templateCache } from './cache.js';
-
 export { html };
 
 function html(templateParts, ...values) {
-  if (!templateCache.has(templateParts)) {
-    templateCache.set(templateParts, compile(templateParts, ...values));
-  }
-
-  return templateCache.get(templateParts)(...values);
+  return gen(templateParts, values);
 }
 
-const zip = (a, b) => a.map((item, i) => [item, b[i]]);
-
-const compile = (templateParts, ...values) => {
-  const segments = [];
-  let syncRun = { type: 'sync', startPart: templateParts[0], ops: [] };
-
-  for (const [value, part] of zip(values, templateParts.slice(1))) {
+function* gen(templateParts, values) {
+  let str = templateParts[0];
+  for (const [i, value] of values.entries()) {
     if (value?.[Symbol.iterator] && typeof value !== 'string') {
-      segments.push(syncRun, { type: 'iter' });
-      syncRun = { type: 'sync', startPart: part, ops: [] };
+      yield str;
+      str = templateParts[i + 1];
+      yield* value;
     } else if (isAsync(value)) {
-      segments.push(syncRun, { type: 'async' });
-      syncRun = { type: 'sync', startPart: part, ops: [] };
+      yield str;
+      str = templateParts[i + 1];
+      yield value;
     } else {
-      syncRun.ops.push({
-        op: typeof value === 'object' ? 'attributes' : 'escape',
-        part,
-      });
+      str +=
+        (typeof value === 'object' && value !== null
+          ? attributesFragment(value)
+          : escape(String(value))) + templateParts[i + 1];
     }
   }
-
-  segments.push(syncRun);
-
-  return function* (...values) {
-    let vi = 0;
-    for (const segment of segments) {
-      if (segment.type === 'iter') {
-        yield* values[vi++];
-      } else if (segment.type === 'async') {
-        yield values[vi++];
-      } else {
-        let str = segment.startPart;
-        for (const { op, part } of segment.ops) {
-          str +=
-            (op === 'attributes'
-              ? attributesFragment(values[vi])
-              : escape(String(values[vi]))) + part;
-          vi++;
-        }
-        yield str;
-      }
-    }
-  };
-};
+  if (str) {
+    yield str;
+  }
+}
 
 const attributesFragment = (value) =>
   Object.entries(value)
-    .filter(([_, value]) => value !== false)
+    .filter(([, value]) => value !== false)
     .map(([attr, value]) => `${attr}="${escape(value)}"`)
     .join(' ');
 

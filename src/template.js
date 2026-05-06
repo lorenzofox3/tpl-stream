@@ -1,10 +1,14 @@
-export { html };
+export { html, raw };
 
-function html(templateParts, ...values) {
-  return gen(templateParts, values);
+function raw(value) {
+  return [value];
 }
 
-function* gen(templateParts, values) {
+function html(templateParts, ...values) {
+  return gen({ templateParts, values });
+}
+
+function* gen({ templateParts, values }) {
   let str = templateParts[0];
   for (const [i, value] of values.entries()) {
     if (value?.[Symbol.iterator] && typeof value !== 'string') {

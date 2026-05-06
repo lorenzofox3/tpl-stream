@@ -27,16 +27,15 @@ A template is defined using the ``html`` [tagged template](https://developer.moz
 ```js
 import {html, renderAsString} from 'tpl-stream';
 
-const Greeting = ({name, classname}) => html`<p class="{classname}">${name}</p>`;
+const Greeting = ({name, classname}) => html`<p class="${classname}">${name}</p>`;
 
-const htmlString = await renderAsString(Greeting({name: 'Lorenzofox', classname: 'primary'}))
-
+const htmlString = await renderAsString(Greeting({name: 'world', classname: 'primary'}));
+// '<p class="primary">world</p>'
 ```
 
-when rendered, the HTML string will be ``'<p class="primary">Lorenzofox</p>'``
-Interpolated expressions are automatically escaped whether they correspond to a text content or to an attribute.
+Interpolated expressions are automatically escaped whether they correspond to text content or an attribute value.
 
-Raw HTML can also be inserted by wrapping the string within an array:
+Raw HTML can be inserted by wrapping the string in an array:
 
 ```js
 html`<p>${['<span>42</span>']}</p>`
@@ -44,77 +43,68 @@ html`<p>${['<span>42</span>']}</p>`
 
 ### Composition
 
-Multiple templates can be combined together to create more complex templates:
+Templates compose by nesting — any interpolated value can itself be a template:
 
 ```js
 const Tpl1 = ({title, content}) => html`<h1>${title}</h1><main>${content}</main>`;
 
 const Tpl2 = ({name}) => html`<p>${name}</p>`;
-    
+
 const htmlString = await renderAsString(Tpl1({
-    title:'some title',
-    content: Tpl2({name:'Lorenzofox'})
+    title: 'some title',
+    content: Tpl2({name: 'world'}),
 }));
 
-// <h1>some title</h1><main><p>Lorenzofox</p></main>
-```
-
-### Conditionals
-
-When using conditional, via ternary expression for example, all the branches should be isomorphic (i.e. return the same type): the templates are compiled for optimisation and this is based on the interpretation of the first interpolated value:
-
-```js
-// don't
-<p>${ foo ? html`<span>42</span>` : ''}</p>
-
-// do
-<p>${ foo ? html`<span>42</span>` : html``}</p>
+// <h1>some title</h1><main><p>world</p></main>
 ```
 
 ### Containers
 
-Interpolation can work on some _containers_: Promise, Iterable(Array), Streams(anything that implements AsyncIterator) or Objects
-These containers must contain a template, a string or another container.
+Interpolation supports several _containers_: Promise, Iterable (Array), Streams (anything implementing AsyncIterator), or plain objects.
+Containers must contain a template, a string, or another container.
 
 ```js
 html`<ul>${['foo', 'bar'].map(str => html`<li>${str}</li>`)}</ul>`
 
-// or 
+// or
 
 html`<p>${Promise.resolve(html`<span>42</span>`)}</p>`
 ```
 
-An object container is always be interpreted as a map of attributes (there is no parsing context). 
-key-value pairs whose value is strictly equal to ``false`` are ignored.
+A plain object is always interpreted as a map of HTML attributes. Key-value pairs whose value is strictly ``false`` are omitted.
 
 ```js
-html`<button ${{disabled:false, ['aria-controls']:'woot'}}>hello</button>`
+html`<button ${{disabled: false, ['aria-controls']: 'woot'}}>hello</button>`
 
 // <button aria-controls="woot">hello</button>
 ```
 
 ### render
 
-The ``render`` function takes a template as input and returns a ``ReadableStream``. The chunks are split every time there is a pending Promise: 
+The ``render`` function takes a template and returns a ``ReadableStream``. Chunks are flushed at every async boundary (Promise or async iterator):
 
 ```js
-<p>foo<span>${43}</span>woot<span>${Promise.resolve('woot')}</span></p>
+const stream = render(html`<p>foo<span>${Promise.resolve('bar')}</span></p>`);
 
-// chunks: ['<p>foo<span>43</span>woot</span>', 'woot'</span></p>]
+// chunks: ['<p>foo<span>', 'bar</span></p>']
 ```
 
-A template can be rendered as a string, by awaiting the Promise returned by ``renderAsString`` function. 
+``renderAsString`` collects all chunks into a single awaited string:
+
+```js
+const html = await renderAsString(template);
+```
 
 ## Perceived speed
 
-Streaming may also improve the _perceived_ speed as the browser renders the HTML (and possibly fetching some resources) while the server has not fully responded to the request.
-This behaviour can be observed below: the database has an (exaggerated) latency of 1s when the server calls it to fetch the blog posts data. On the left side, the server has already started streaming the first part of the HTML, and the browser can already render the upper part of the document (and fetch the stylesheets and other resources) while the database is still responding. 
+Streaming improves _perceived_ speed because the browser can start rendering and fetching sub-resources while the server is still generating the rest of the page.
 
-This library can be combined with techniques like [Out Of Order streaming](https://lamplightdev.com/blog/2024/01/10/streaming-html-out-of-order-without-javascript/) to improve the user experience even further. 
+The example below has an (exaggerated) 1s database latency. On the left, the server streams the initial HTML immediately so the browser can render the page header and fetch stylesheets before the data arrives.
+
+This library pairs well with techniques like [Out Of Order streaming](https://lamplightdev.com/blog/2024/01/10/streaming-html-out-of-order-without-javascript/) for even better user experience.
 
 
 
 https://github.com/lorenzofox3/tpl-stream/assets/2402022/d0a52057-240f-4ee4-afe7-920acea8a1af
-
 
 

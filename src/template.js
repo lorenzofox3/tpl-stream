@@ -4,30 +4,24 @@ function raw(value) {
   return [value];
 }
 
-function html(templateParts, ...values) {
-  return gen({ templateParts, values });
-}
+function* html(templateParts, ...values) {
+  const [firstPart, ...rest] = templateParts;
 
-function* gen({ templateParts, values }) {
-  let str = templateParts[0];
-  for (const [i, value] of values.entries()) {
+  yield firstPart;
+
+  const pairs = values.map((value, index) => [value, rest[index]]);
+
+  for (const [value, part] of pairs) {
     if (value?.[Symbol.iterator] && typeof value !== 'string') {
-      yield str;
-      str = templateParts[i + 1];
       yield* value;
+      yield part;
     } else if (isAsync(value)) {
-      yield str;
-      str = templateParts[i + 1];
-      yield value;
+      yield* [value, part];
     } else {
-      str +=
-        (typeof value === 'object' && value !== null
-          ? attributesFragment(value)
-          : escape(String(value))) + templateParts[i + 1];
+      yield (typeof value === 'object' && value !== null
+        ? attributesFragment(value)
+        : escape(String(value))) + part;
     }
-  }
-  if (str) {
-    yield str;
   }
 }
 

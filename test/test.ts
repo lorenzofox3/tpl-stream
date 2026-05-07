@@ -37,3 +37,19 @@ render: {
 renderAsString: {
   const result: Promise<string> = renderAsString(html`<div></div>`);
 }
+
+arrayValues: {
+  const ListItem = (value: string) => html`<li>${value}</li>`;
+  const items = [html`item 1`, html`item 2`, html`'item 3`];
+  html`<ul>
+    ${items.map(ListItem)}
+  </ul>`;
+  const otherItems = [
+    [html`item 1a`, html`item 1b`],
+    html`item 2`,
+    html`item 3`,
+  ];
+  html`<ul>
+    ${otherItems.map(ListItem)}
+  </ul>`;
+}

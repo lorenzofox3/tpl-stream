@@ -1,30 +1,26 @@
 export { render, renderAsString };
 
 // we use coroutine instead of async iterable to avoid Promise overhead (for perf)
-function* _render(template, controller) {
+function* _render({ template, enqueue }) {
+  if (typeof template === 'string') {
+    return enqueue(template);
+  }
+
   for (const chunk of template) {
     if (typeof chunk === 'string') {
-      controller.enqueue(chunk);
+      enqueue(chunk);
     } else if (chunk?.[Symbol.iterator]) {
-      yield* _render(chunk, controller);
+      yield* _render({ template: chunk, enqueue });
     } else if (chunk?.then) {
       const resolved = yield chunk;
-      if (typeof resolved === 'string') {
-        controller.enqueue(resolved);
-      } else {
-        yield* _render(resolved, controller);
-      }
+      yield* _render({ template: resolved, enqueue });
     } else if (chunk?.[Symbol.asyncIterator]) {
       while (true) {
         const { value: resolved, done } = yield chunk.next();
         if (done === true) {
           break;
         }
-        if (typeof resolved === 'string') {
-          controller.enqueue(resolved);
-        } else {
-          yield* _render(resolved, controller);
-        }
+        yield* _render({ template: resolved, enqueue });
       }
     } else {
       throw new Error('Unsupported chunk');
@@ -32,43 +28,50 @@ function* _render(template, controller) {
   }
 }
 
-function render(template, { highWaterMark = 1 } = {}) {
+function render(template, options) {
   const buffer = [];
-  const iterable = _render(template, { enqueue: (val) => buffer.push(val) });
+  const iterable = _render({
+    template,
+    enqueue: (val) => buffer.push(val),
+  });
   let pendingValue;
 
   return new ReadableStream(
     {
       async pull(controller) {
-        const chunk = pendingValue;
-        pendingValue = undefined;
-        return pump(chunk);
+        return pump(pendingValue);
 
         async function pump(chunk) {
           const { value, done } = iterable.next(chunk);
 
           if (done) {
-            if (buffer.length) controller.enqueue(buffer.join(''));
-            return controller.close();
+            if (buffer.length > 0) {
+              controller.enqueue(buffer.join(''));
+              buffer.length = 0;
+            }
+
+            controller.close();
+            return;
           }
 
-          if (!value?.then) return pump(value);
+          if (value?.then) {
+            if (buffer.length) {
+              controller.enqueue(buffer.join(''));
+              buffer.length = 0;
+            }
 
-          // Async boundary: flush buffered content and respect backpressure.
-          if (buffer.length) {
-            controller.enqueue(buffer.join(''));
-            buffer.length = 0;
+            pendingValue = await value;
+
             if (controller.desiredSize <= 0) {
-              pendingValue = await value;
               return;
             }
-          }
 
-          return pump(await value);
+            return pump(pendingValue);
+          }
         }
       },
     },
-    { highWaterMark },
+    options,
   );
 }
 

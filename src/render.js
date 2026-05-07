@@ -28,7 +28,7 @@ function* _render({ template, enqueue }) {
   }
 }
 
-function render(template, options) {
+function render(template, { highWaterMark = 1024 } = {}) {
   const buffer = [];
   const iterable = _render({
     template,
@@ -71,7 +71,7 @@ function render(template, options) {
         }
       },
     },
-    options,
+    { highWaterMark, size: (chunk) => chunk.length }, // as we work on strings we approximate the byteLength with the string length
   );
 }
 

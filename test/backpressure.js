@@ -27,7 +27,7 @@ const tick = () => new Promise((r) => setTimeout(r, 0));
 
 test('fast producer does not race ahead of a slow consumer', async ({ eq }) => {
   const { iter, nextCalls } = makeTrackedAsyncIter(['a', 'b', 'c']);
-  const stream = render(html`${iter}`);
+  const stream = render(html`${iter}`, { highWaterMark: 1 });
   const reader = stream.getReader();
 
   for (let consumed = 0; consumed < 3; consumed++) {
@@ -61,7 +61,7 @@ test('async generator body does not advance past yield while consumer is idle', 
     log.push('before-d'); yield 'd';
   }
 
-  const stream = render(html`${source()}`);
+  const stream = render(html`${source()}`, { highWaterMark: 1 });
   const reader = stream.getReader();
 
   await reader.read(); // 'a'
@@ -121,32 +121,30 @@ test('slow consumer receives all data via pipeTo', async ({ eq }) => {
   eq(received.join(''), 'pqr');
 });
 
-test('adapts to desiredSize — fills multiple chunks per pull when highWaterMark > 1', async ({
+test('adapts to desiredSize — buffers more bytes per pull when highWaterMark is larger', async ({
   eq,
 }) => {
   const { iter, nextCalls } = makeTrackedAsyncIter(['a', 'b', 'c', 'd']);
 
-  // highWaterMark: 2 means desiredSize starts at 2, so pull() should keep
-  // producing until it has enqueued 2 chunks, then pause.
+  // highWaterMark: 2 means 2 bytes. '' (0 bytes) doesn't reduce desiredSize, so pull()
+  // keeps going: 'a' (1 byte, desiredSize=1) then 'b' (1 byte, desiredSize=0) — 3 next()
+  // calls total. With HWM=1 byte the stream stops after 'a' (2 next() calls).
   const stream = render(html`${iter}`, { highWaterMark: 2 });
   const reader = stream.getReader();
 
   // Let the initial pull() run to completion (all Promise.resolve microtasks settle).
   await tick();
 
-  // html`${iter}` has empty static parts ('', ''), so the first enqueued chunk is ''.
-  // desiredSize drops from 2 to 1 — still > 0 — so pull() keeps going and enqueues 'a'.
-  // That requires 2 next() calls (indices 0 and 1) before desiredSize hits 0.
-  // With HWM=1 the same pull() would have stopped after enqueueing '' (1 next() call).
   eq(
-    nextCalls.length >= 2,
+    nextCalls.length >= 3,
     true,
-    `expected ≥2 next() calls to fill HWM=2, got ${nextCalls.length}`,
+    `expected ≥3 next() calls to fill HWM=2 bytes, got ${nextCalls.length}`,
   );
 
-  // Both chunks are already queued — reads should be immediate.
+  // '', 'a', and 'b' are already queued — reads should be immediate.
   await reader.read(); // '' — empty static part of html`${iter}`
   eq((await reader.read()).value, 'a');
+  eq((await reader.read()).value, 'b');
 
   while (!(await reader.read()).done) {}
 });

@@ -29,7 +29,7 @@ html: {
 
 render: {
   const stream: ReadableStream<string> = render(html`<div></div>`);
-  render(html`<div></div>`, { highWaterMark: 2 });
+  render(html`<div></div>`, { highWaterMark: 512 });
   // @ts-expect-error highWaterMark must be a number
   render(html`<div></div>`, { highWaterMark: 'big' });
 }

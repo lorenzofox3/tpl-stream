@@ -4,15 +4,18 @@ export declare function raw(value: string): UnsafeHTML;
 
 declare const templateBrand: unique symbol;
 
-type HTMLValue =
-  | string
+type HTMLNonString =
   | number
   | boolean
   | Record<string, string | boolean | number>
   | UnsafeHTML
   | HTMLTemplate
-  | Promise<string | HTMLTemplate>
-  | AsyncIterable<string | HTMLTemplate>;
+  | HTMLNonString[]
+  | IterableIterator<HTMLNonString>
+  | Promise<HTMLNonString>
+  | AsyncIterable<HTMLNonString>;
+
+type HTMLValue = string | HTMLNonString;
 
 export interface HTMLTemplate
   extends Iterable<string | HTMLTemplate | Promise<unknown>> {

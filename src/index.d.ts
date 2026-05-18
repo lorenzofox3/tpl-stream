@@ -4,23 +4,25 @@ export declare function raw(value: string): UnsafeHTML;
 
 declare const templateBrand: unique symbol;
 
+// needs to be using interfaces to break self referencing type TS bug and force lazy evaluation
+interface HTMLIterableValue extends Iterable<HTMLNonString> {}
+interface HTMLAsyncIterableValue extends AsyncIterable<HTMLNonString> {}
+
 type HTMLNonString =
   | number
   | boolean
   | Record<string, string | boolean | number>
   | UnsafeHTML
   | HTMLTemplate
-  | HTMLNonString[]
-  | IterableIterator<HTMLNonString>
   | Promise<HTMLNonString>
-  | AsyncIterable<HTMLNonString>;
+  | (HTMLIterableValue & object) // & object to "filter out" string which is itself iterable
+  | (HTMLAsyncIterableValue & object);
 
 type HTMLValue = string | HTMLNonString;
 
-export interface HTMLTemplate
-  extends Iterable<string | HTMLTemplate | Promise<unknown>> {
+type HTMLTemplate = Iterable<string | HTMLTemplate | Promise<unknown>> & {
   readonly [templateBrand]: true;
-}
+};
 
 export declare function html(
   strings: TemplateStringsArray,

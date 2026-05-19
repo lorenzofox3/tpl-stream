@@ -26,3 +26,14 @@ test('attributes whose value is false are ignored', async ({ eq }) => {
   );
   eq(htmlString, `<input type="number" />`);
 });
+
+test('attribute names are escaped', async ({ eq }) => {
+  const htmlString = await renderAsString(
+    // prettier-ignore
+    html`<input ${{ 'value" onxss="injected': 'safe' }} />`,
+  );
+  eq(
+    htmlString,
+    `<input value&quot; onxss=&quot;injected="safe" />`,
+  );
+});

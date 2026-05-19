@@ -28,7 +28,7 @@ function* html(templateParts, ...values) {
 const attributesFragment = (value) =>
   Object.entries(value)
     .filter(([, value]) => value !== false)
-    .map(([attr, value]) => `${attr}="${escape(value)}"`)
+    .map(([attr, value]) => `${escape(attr)}="${escape(value)}"`)
     .join(' ');
 
 const isAsync = (value) =>

@@ -43,6 +43,8 @@ import {html, raw, renderAsString} from 'tpl-stream';
 html`<p>${raw('<span>42</span>')}</p>`
 ```
 
+> **Warning for JavaScript users:** any iterable value (e.g. a plain array) passed as an interpolation is yielded as-is without escaping. TypeScript users get a compile-time error when bypassing ``raw``; plain JavaScript offers no such guard, so take care not to interpolate unsanitised user input inside an iterable.
+
 ### Composition
 
 Templates compose by nesting — any interpolated value can itself be a template:

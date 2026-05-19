@@ -36,3 +36,14 @@ test('interpolated attributes are escaped (HTML attribute Contexts)', async ({
     `<p id="&quot;&gt;bim"></p>`,
   );
 });
+
+test('null and undefined in text position render as empty string', async ({
+  eq,
+}) => {
+  eq(await renderAsString(html`<p>${null}</p>`), `<p></p>`);
+  eq(await renderAsString(html`<p>${undefined}</p>`), `<p></p>`);
+  eq(
+    await renderAsString(html`<p>${null}${undefined}text</p>`),
+    `<p>text</p>`,
+  );
+});

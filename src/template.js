@@ -20,7 +20,9 @@ function* html(templateParts, ...values) {
     } else {
       yield (typeof value === 'object' && value !== null
         ? attributesFragment(value)
-        : escape(String(value))) + part;
+        : isNil(value)
+          ? ''
+          : escape(String(value))) + part;
     }
   }
 }
@@ -33,6 +35,8 @@ const attributesFragment = (value) =>
 
 const isAsync = (value) =>
   value?.then !== undefined || value?.[Symbol.asyncIterator];
+
+const isNil = (value) => value === null || value === undefined;
 
 const escapeMap = {
   '&': '&amp;',

@@ -1,4 +1,12 @@
-import { html, raw, render, renderAsString, HTMLTemplate, UnsafeHTML } from '../src/index';
+import {
+  html,
+  raw,
+  render,
+  renderAsString,
+  HTMLTemplate,
+  UnsafeHTML,
+  SafeInterpolation,
+} from '../src/index';
 
 raw: {
   const wrapped: UnsafeHTML = raw('<span></span>');
@@ -113,6 +121,61 @@ composition: {
   const Card = ({ name }: { name: string }): HTMLTemplate =>
     html`<p>${name}</p>`;
   renderAsString(Layout({ title: 'hello', content: Card({ name: 'world' }) }));
+}
+
+safeInterpolation: {
+  // resolves to T when T is not a string
+  const _n: SafeInterpolation<number> = 42;
+  const _b: SafeInterpolation<boolean> = true;
+  const _t: SafeInterpolation<HTMLTemplate> = html`<span></span>`;
+  const _u: SafeInterpolation<UnsafeHTML> = raw('<b>bold</b>');
+
+  // @ts-expect-error string resolves to error message — use raw() instead
+  const _s: SafeInterpolation<string> = 'hello';
+
+  // ergonomic use case: generic component that rejects plain strings
+  function Item<T>(value: SafeInterpolation<T>): HTMLTemplate {
+    return html`<li>${value as HTMLTemplate}</li>`;
+  }
+  Item(42);
+  Item(html`<span></span>`);
+  // @ts-expect-error plain string not allowed — use raw()
+  Item('hello');
+
+  // Assert the exact error message text at the type level.
+  // Two-direction check:
+  //   1. exact literal is assignable → catches message text changes
+  //   2. @ts-expect-error on a different string → catches the type being widened to plain `string`
+  //      (if SafeInterpolation<string> were `string`, the @ts-expect-error below would become
+  //       an "Unused '@ts-expect-error' directive" compile error, failing the suite)
+  const _msgOk: SafeInterpolation<string> =
+    'Error: wrap string values with raw() for safe HTML interpolation';
+  // @ts-expect-error any other string is not assignable
+  const _msgWrong: SafeInterpolation<string> = 'other string';
+}
+
+// Containers inside html`` now surface the SafeInterpolation error message:
+//   Type 'string' is not assignable to type
+//     '"toto Error: wrap string values with raw() for safe HTML interpolation" | number | boolean | ...'
+htmlContainerStrings: {
+  // @ts-expect-error promise resolving to string — use raw()
+  html`<p>${Promise.resolve('foo')}</p>`;
+  html`<p>${Promise.resolve(raw('foo'))}</p>`;
+
+  // @ts-expect-error array of strings — use raw()
+  html`<p>${['<script>xss</script>']}</p>`;
+  html`<p>${[raw('<b>bold</b>')]}</p>`;
+
+  async function* asyncStrings() {
+    yield 'chunk';
+  }
+  // @ts-expect-error async iterable of strings — use raw()
+  html`<p>${asyncStrings()}</p>`;
+  html`<p>
+    ${(async function* () {
+      yield raw('chunk');
+    })()}
+  </p>`;
 }
 
 iterable: {
